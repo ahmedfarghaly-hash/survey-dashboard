@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Feedback Survey — نتائج الاستبيان</title>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://unpkg.com/recharts@2.8.0/umd/Recharts.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #050d1a; font-family: system-ui, -apple-system, sans-serif; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #0d1e35; }
+    ::-webkit-scrollbar-thumb { background: #19324f; border-radius: 3px; }
+    select option { background: #0d1e35; color: #f1f5f9; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useMemo } = React;
+    const { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } = Recharts;
+
+    const T = { bg:"#050d1a", surface:"#080f1f", card:"#0d1e35", border:"#19324f", accent:"#3b82f6", success:"#22c55e", warn:"#f59e0b", danger:"#ef4444", text:"#f1f5f9", muted:"#8ba3bf", dim:"#354e68" };
+
+    const ALL = [
+      {id:1,date:"2 Sep",cl:"clear",corrected:"لا",diff:"سرعة اللقطة",needs:"none",pref:"online",note:false,hr:"",team:"",name:""},
+      {id:2,date:"2 Sep",cl:"partial",corrected:"Positioning Duel",diff:"—",needs:"none",pref:"1:1",note:false,hr:"",team:"",name:""},
+      {id:3,date:"2 Sep",cl:"clear",corrected:"Hold up, Positioning Duel",diff:"ماتشات الأكاديمي",needs:"none",pref:"1:1",note:false,hr:"",team:"",name:""},
+      {id:4,date:"2 Sep",cl:"clear",corrected:"لا",diff:"سرعة اللقطة",needs:"none",pref:"1:1",note:false,hr:"",team:"",name:""},
+      {id:5,date:"2 Sep",cl:"clear",corrected:"لا",diff:"سرعة اللقطة",needs:"none",pref:"online",note:true,hr:"",team:"",name:""},
+      {id:6,date:"2 Sep",cl:"clear",corrected:"لا",diff:"سرعة اللقطة، استحواذ",needs:"none",pref:"1:1",note:false,hr:"A-2282",team:"R",name:"Hassan Essam"},
+      {id:7,date:"2 Sep",cl:"clear",corrected:"Positioning Duel, Separation Duel",diff:"تشابه الأيفنتات، كاميرا",needs:"Positioning Duel",pref:"1:1",note:false,hr:"A-2243",team:"T",name:"Ahmed Hamed Shaban"},
+      {id:8,date:"2 Sep",cl:"unclear",corrected:"لا",diff:"سرعة اللقطة",needs:"none",pref:"online",note:true,hr:"A-1846",team:"G",name:"(Option 1)"},
+      {id:9,date:"2 Sep",cl:"clear",corrected:"لا",diff:"سرعة اللقطة",needs:"Positioning Duel",pref:"online",note:false,hr:"A-2068",team:"T",name:"Moaaz Mohamed"},
+      {id:10,date:"2 Sep",cl:"clear",corrected:"لا",diff:"سرعة اللقطة",needs:"none",pref:"online",note:false,hr:"A-1555",team:"U",name:"Momen Memey Shahat"},
+      {id:11,date:"2 Sep",cl:"clear",corrected:"كل الأيفنتات الأربعة",diff:"تشابه الأيفنتات",needs:"none",pref:"online",note:false,hr:"A-2559",team:"Y",name:"Sherif Mohamed Abd Elgawad"},
+      {id:12,date:"2 Sep",cl:"clear",corrected:"لا",diff:"سرعة اللقطة",needs:"Hold up",pref:"1:1",note:false,hr:"A-2161",team:"G",name:"Ali Ali"},
+      {id:13,date:"2 Sep",cl:"clear",corrected:"لا",diff:"سرعة اللقطة",needs:"none",pref:"1:1",note:false,hr:"A-1626",team:"S",name:"Marwan Mohamed"},
+      {id:14,date:"2 Sep",cl:"unclear",corrected:"لا",diff:"سرعة اللقطة",needs:"none",pref:"online",note:false,hr:"1655",team:"S",name:"Ebrahim Ali Mohamed"},
+      {id:15,date:"2 Sep",cl:"clear",corrected:"لا",diff:"سرعة اللقطة",needs:"none",pref:"1:1",note:true,hr:"A-1309",team:"V",name:"Eyad Ehab"},
+      {id:16,date:"2 Sep",cl:"clear",corrected:"لا",diff:"سرعة اللقطة",needs:"none",pref:"online",note:true,hr:"A-1654",team:"U",name:"Ahmed Mohamed Ramadan"},
+      {id:17,date:"2 Sep",cl:"partial",corrected:"Hold up, Positioning Duel",diff:"سرعة اللقطة",needs:"none",pref:"online",note:false,hr:"A-2156",team:"U",name:"Gamal Khaled Mahmoud"},
+      {id:18,date:"2 Sep",cl:"clear",corrected:"Positioning Duel, Separation Duel",diff:"سرعة اللقطة",needs:"none",pref:"online",note:false,hr:"A-564",team:"D",name:"Mahmoud Abdelhmd"},
+      {id:19,date:"2 Sep",cl:"clear",corrected:"لا",diff:"سرعة اللقطة",needs:"Positioning Duel",pref:"online",note:true,hr:"A-1674",team:"S",name:"Omar Fathi Mohamed"},
+      {id:20,date:"2 Sep",cl:"clear",corrected:"لا",diff:"سرعة اللقطة",needs:"none",pref:"online",note:false,hr:"A-2471",team:"K",name:"Youssif Helbawy"},
+      {id:21,date:"2 Sep",cl:"clear",corrected:"Positioning Duel",diff:"سرعة اللقطة، استحواذ",needs:"none",pref:"1:1",note:false,hr:"A-2548",team:"K",name:"Yad"},
+      {id:22,date:"2 Sep",cl:"clear",corrected:"Positioning Duel, Separation Duel",diff:"سرعة اللقطة، low quality",needs:"none",pref:"site",note:false,hr:"A-2479",team:"K",name:""},
+      {id:23,date:"2 Sep",cl:"clear",corrected:"Hold up",diff:"سرعة اللقطة",needs:"none",pref:"1:1",note:false,hr:"A-2429",team:"K",name:"Kamal Ramadan"},
+      {id:24,date:"2 Sep",cl:"clear",corrected:"لا",diff:"—",needs:"none",pref:"1:1",note:true,hr:"A-1672",team:"S",name:"Yassin Hassan"},
+      {id:25,date:"2 Sep",cl:"clear",corrected:"Leg Stretch",diff:"سرعة اللقطة",needs:"none",pref:"1:1",note:false,hr:"A-2200",team:"S",name:"Omar Mohamed Abdelal"},
+      {id:26,date:"2 Sep",cl:"clear",corrected:"لا",diff:"تشابه الأيفنتات",needs:"none",pref:"online",note:false,hr:"2180",team:"R",name:"Omar Essam Hossny"},
+      {id:27,date:"2 Sep",cl:"clear",corrected:"لا",diff:"سرعة اللقطة",needs:"none",pref:"online",note:false,hr:"A-2136",team:"K",name:"Youssef Ahmed"},
+      {id:28,date:"2 Sep",cl:"partial",corrected:"Separation Duel",diff:"سرعة اللقطة",needs:"Separation Duel",pref:"1:1",note:false,hr:"A-395",team:"G",name:"Ahmed Seyam"},
+      {id:29,date:"2 Sep",cl:"clear",corrected:"لا",diff:"سرعة اللقطة",needs:"none",pref:"online",note:true,hr:"A-1562",team:"G",name:"Hassan Gamal"},
+      {id:30,date:"2 Sep",cl:"partial",corrected:"لا",diff:"سرعة اللقطة",needs:"Positioning Duel",pref:"online",note:true,hr:"A-1778",team:"L",name:"Khaled Mohamed"},
+      {id:31,date:"2 Sep",cl:"clear",corrected:"لا",diff:"استحواذ",needs:"none",pref:"online",note:false,hr:"A-2198",team:"K",name:"Mahmoud Nabil"},
+      {id:32,date:"2 Sep",cl:"clear",corrected:"لا",diff:"سرعة اللقطة",needs:"none",pref:"1:1",note:false,hr:"A-1816",team:"U",name:"Ali Abdelgawad Abdelmohsen"},
+      {id:33,date:"2 Sep",cl:"clear",corrected:"لا",diff:"تشابه الأيفنتات",needs:"none",pref:"1:1",note:false,hr:"A-1118",team:"D'",name:"Hassan Maher Hassan"},
+      {id:34,date:"2 Sep",cl:"clear",corrected:"لا",diff:"سرعة اللقطة",needs:"none",pref:"1:1",note:false,hr:"A-2101",team:"Y",name:"Ahmed Hesham Abdulatif"},
+      {id:35,date:"2 Sep",cl:"clear",corrected:"Leg Stretch, Positioning Duel",diff:"سرعة اللقطة",needs:"none",pref:"1:1",note:true,hr:"A-1521",team:"Y",name:"Marwan Ayman"},
+      {id:36,date:"2 Sep",cl:"clear",corrected:"Positioning Duel",diff:"سرعة اللقطة",needs:"none",pref:"site",note:false,hr:"A-2229",team:"Y",name:"Youssef Mohamed Labib"},
+      {id:37,date:"2 Sep",cl:"partial",corrected:"Separation Duel",diff:"سرعة اللقطة",needs:"none",pref:"online",note:false,hr:"A-2456",team:"Y",name:"Mostafa Ahmed"},
+      {id:38,date:"2 Sep",cl:"clear",corrected:"لا",diff:"سرعة اللقطة",needs:"none",pref:"1:1",note:true,hr:"A-2244",team:"K",name:"Assem"},
+      {id:39,date:"2 Sep",cl:"clear",corrected:"لا",diff:"سرعة اللقطة",needs:"Positioning Duel",pref:"1:1",note:false,hr:"A-1635",team:"Y",name:"Mohamed Ahmed Shaker"},
+      {id:40,date:"2 Sep",cl:"clear",corrected:"Positioning Duel",diff:"سرعة اللقطة",needs:"none",pref:"1:1",note:false,hr:"A-2547",team:"K",name:"Abanoub Adly Attia"},
+      {id:41,date:"2 Sep",cl:"clear",corrected:"لا",diff:"سرعة اللقطة",needs:"none",pref:"site",note:false,hr:"A-2280",team:"K",name:"Abdelrhman Ismael"},
+      {id:42,date:"2 Sep",cl:"clear",corrected:"لا",diff:"سرعة اللقطة",needs:"none",pref:"online",note:false,hr:"A-2588",team:"D'",name:"Omar Alaa Abdelfattah"},
+      {id:43,date:"2 Sep",cl:"clear",corrected:"لا",diff:"سرعة اللقطة",needs:"none",pref:"online",note:false,hr:"A-319",team:"U",name:"Amr Mohy Eldin"},
+      {id:44,date:"2 Sep",cl:"clear",corrected:"لا",diff:"سرعة اللقطة",needs:"none",pref:"online",note:false,hr:"A-2560",team:"Y",name:"Basem Mohamed"},
+      {id:45,date:"2 Sep",cl:"clear",corrected:"لا",diff:"—",needs:"none",pref:"online",note:false,hr:"A-2457",team:"K",name:"Ahmed Reda"},
+      {id:46,date:"2 Sep",cl:"clear",corrected:"لا",diff:"—",needs:"none",pref:"—",note:false,hr:"A-1820",team:"T",name:"Ahmed Abdrabo"},
+      {id:47,date:"3 Sep",cl:"clear",corrected:"Hold up",diff:"استحواذ",needs:"none",pref:"1:1",note:false,hr:"A-2186",team:"M",name:"Hany Fathy El Sayed"},
+      {id:48,date:"3 Sep",cl:"partial",corrected:"لا",diff:"تشابه الأيفنتات، استحواذ",needs:"Positioning Duel",pref:"1:1",note:true,hr:"A-2278",team:"X",name:"Mohamed Ahmed Hammad"},
+      {id:49,date:"3 Sep",cl:"clear",corrected:"Separation Duel",diff:"سرعة اللقطة",needs:"none",pref:"1:1",note:false,hr:"A-1825",team:"X",name:"Joseph Bahrawi"},
+      {id:50,date:"3 Sep",cl:"partial",corrected:"Positioning Duel, Separation Duel",diff:"سرعة اللقطة، استحواذ",needs:"Leg Stretch, Separation Duel",pref:"1:1",note:true,hr:"A-2096",team:"X",name:"Mohamed Hesham Sleem"},
+      {id:51,date:"3 Sep",cl:"partial",corrected:"Separation Duel",diff:"سرعة اللقطة",needs:"Positioning Duel, Separation Duel",pref:"1:1",note:false,hr:"A-1410",team:"G",name:"Omar Hadad"},
+      {id:52,date:"3 Sep",cl:"partial",corrected:"لا",diff:"ماتشات متعددة الأكشنات",needs:"none",pref:"site",note:false,hr:"A-1275",team:"Y",name:"Mohamed Alaa"},
+      {id:53,date:"3 Sep",cl:"clear",corrected:"لا",diff:"—",needs:"none",pref:"1:1",note:true,hr:"A-2174",team:"X",name:"Belal Hegazy Ramadan"},
+      {id:54,date:"3 Sep",cl:"clear",corrected:"لا",diff:"—",needs:"none",pref:"1:1",note:false,hr:"A-1546",team:"G",name:"Mahmoud Hamada"},
+      {id:55,date:"3 Sep",cl:"clear",corrected:"Separation Duel",diff:"سرعة اللقطة",needs:"none",pref:"site",note:false,hr:"A-2490",team:"Y",name:"Mohamed Soudi"},
+      {id:56,date:"3 Sep",cl:"partial",corrected:"Hold up, Positioning Duel",diff:"سرعة اللقطة، استحواذ",needs:"Positioning Duel",pref:"online",note:true,hr:"A-562",team:"R",name:"Ahmed Saber"},
+      {id:57,date:"3 Sep",cl:"clear",corrected:"لا",diff:"—",needs:"none",pref:"1:1",note:false,hr:"A-1809",team:"Y",name:"Ahmed Hamza Abdelrahman"},
+      {id:58,date:"3 Sep",cl:"partial",corrected:"Hold up, Positioning Duel",diff:"سرعة اللقطة",needs:"Hold up, Positioning Duel",pref:"online",note:false,hr:"A-2175",team:"R",name:"Mazen Nabil Abdelghany"},
+      {id:59,date:"3 Sep",cl:"clear",corrected:"لا",diff:"جودة الفيديو",needs:"none",pref:"online",note:false,hr:"A-2557",team:"Y",name:"Mohamed Ayman Mohamed"},
+      {id:60,date:"3 Sep",cl:"clear",corrected:"Positioning Duel",diff:"استحواذ",needs:"none",pref:"online",note:true,hr:"A-2093",team:"U",name:"Omar Nasr"},
+      {id:61,date:"3 Sep",cl:"clear",corrected:"لا",diff:"تشابه الأيفنتات، كاميرا",needs:"none",pref:"1:1",note:false,hr:"2466",team:"K",name:"Osama Gharib"},
+      {id:62,date:"3 Sep",cl:"clear",corrected:"لا",diff:"سرعة اللقطة",needs:"none",pref:"online",note:false,hr:"A-2568",team:"L",name:"Hassan Esam"},
+      {id:63,date:"3 Sep",cl:"clear",corrected:"Separation Duel",diff:"سرعة اللقطة",needs:"none",pref:"site",note:false,hr:"A-2576",team:"X",name:"Belal Emad Hussein"},
+      {id:64,date:"4 Sep",cl:"clear",corrected:"لا",diff:"استحواذ",needs:"none",pref:"online",note:false,hr:"A-1608",team:"D",name:"Mohamed Mohy"},
+      {id:65,date:"4 Sep",cl:"clear",corrected:"لا",diff:"سرعة اللقطة",needs:"none",pref:"1:1",note:false,hr:"A-2236",team:"T",name:"Moamen Ramadan"},
+      {id:66,date:"4 Sep",cl:"clear",corrected:"لا",diff:"تشابه Hold+Position",needs:"none",pref:"online",note:false,hr:"A-1620",team:"E",name:"Moataz Gamal Ibrahim"},
+      {id:67,date:"4 Sep",cl:"clear",corrected:"Positioning Duel",diff:"تشابه الأيفنتات",needs:"none",pref:"online",note:false,hr:"A-2484",team:"E",name:"Ihab Galal Hassan Galal"},
+      {id:68,date:"4 Sep",cl:"clear",corrected:"لا",diff:"تشابه 50/50 + Position",needs:"none",pref:"online",note:false,hr:"A-2485",team:"E",name:"Ahmed Essam"},
+      {id:69,date:"4 Sep",cl:"clear",corrected:"لا",diff:"سرعة اللقطة، مشكلة النظر للكورة",needs:"none",pref:"1:1",note:true,hr:"A-1452",team:"C",name:"Ahmed Damrani"},
+      {id:70,date:"4 Sep",cl:"clear",corrected:"لا",diff:"سرعة اللقطة",needs:"none",pref:"online",note:false,hr:"A-2117",team:"E",name:"Hazem Hany Mostafa"},
+      {id:71,date:"4 Sep",cl:"clear",corrected:"Hold up, Positioning Duel",diff:"تشابه الأيفنتات",needs:"none",pref:"online",note:false,hr:"A-2554",team:"S",name:"Shehab Aldeen Abdelhamad"},
+      {id:72,date:"4 Sep",cl:"clear",corrected:"لا",diff:"سرعة اللقطة",needs:"Hold up + Leg Stretch",pref:"site",note:false,hr:"A-1644",team:"E",name:"Mohamed Anwer"},
+      {id:73,date:"4 Sep",cl:"clear",corrected:"لا",diff:"سرعة اللقطة",needs:"Separation Duel",pref:"online",note:false,hr:"A-2597",team:"V",name:"Omar Elgendy"},
+      {id:74,date:"4 Sep",cl:"clear",corrected:"لا",diff:"سرعة اللقطة",needs:"none",pref:"online",note:true,hr:"A-1812",team:"Ocv",name:"Mostafa Mohamed Abdelmajed"},
+      {id:75,date:"4 Sep",cl:"clear",corrected:"لا",diff:"سرعة اللقطة",needs:"none",pref:"online",note:true,hr:"A-1832",team:"V",name:"Mohammed Assem"},
+      {id:76,date:"4 Sep",cl:"clear",corrected:"لا",diff:"سرعة اللقطة",needs:"none",pref:"online",note:false,hr:"A-2232",team:"G",name:"Mohamed Yasser"},
+      {id:77,date:"4 Sep",cl:"clear",corrected:"لا",diff:"—",needs:"none",pref:"online",note:true,hr:"A-2170",team:"E",name:"Mohammed Mohammed"},
+      {id:78,date:"4 Sep",cl:"clear",corrected:"لا",diff:"سرعة اللقطة",needs:"none",pref:"site",note:false,hr:"A-2592",team:"D'",name:"Mohaimn Mohamed Saad"},
+      {id:79,date:"5 Sep",cl:"clear",corrected:"Positioning Duel",diff:"سرعة اللقطة",needs:"none",pref:"online",note:false,hr:"A-2541",team:"T",name:"Mahmoud Ahmed"},
+      {id:80,date:"5 Sep",cl:"partial",corrected:"Leg Stretch",diff:"تشابه الأيفنتات",needs:"Leg Stretch",pref:"online",note:true,hr:"A-2210",team:"N",name:"Youssef Ayman Mohamed"},
+    ];
+
+    const CL_COLOR = { clear:"#22c55e", partial:"#f59e0b", unclear:"#ef4444" };
+    const CL_LABEL = { clear:"واضح جداً", partial:"واضح إلى حد ما", unclear:"غير واضح" };
+    const PREF_COLOR = { online:"#3b82f6", "1:1":"#8b5cf6", site:"#22c55e", "—":"#64748b" };
+    const ALL_TEAMS = [...new Set(ALL.filter(r=>r.team).map(r=>r.team))].sort();
+
+    function CT({ active, payload }) {
+      if (!active || !payload?.length) return null;
+      return (
+        <div style={{ background:T.surface, border:`1px solid ${T.border}`, borderRadius:"8px", padding:"10px 14px", fontSize:"12px" }}>
+          <p style={{ color:T.muted, margin:"0 0 4px" }}>{payload[0].payload.label}</p>
+          <p style={{ color:payload[0].payload.color || T.accent, margin:0, fontWeight:"600" }}>{payload[0].value} شخص</p>
+        </div>
+      );
+    }
+
+    function Badge({ label, color }) {
+      return (
+        <span style={{ fontSize:"10px", padding:"2px 7px", borderRadius:"100px", background:`${color}18`, color, border:`1px solid ${color}30`, whiteSpace:"nowrap" }}>
+          {label}
+        </span>
+      );
+    }
+
+    function App() {
+      const [tab, setTab] = useState("responses");
+      const [filterTeam, setFilterTeam] = useState("all");
+      const [filterCl, setFilterCl] = useState("all");
+      const [filterPref, setFilterPref] = useState("all");
+      const [search, setSearch] = useState("");
+
+      const filtered = useMemo(() => {
+        return ALL.filter(r => {
+          if (filterTeam !== "all" && r.team !== filterTeam) return false;
+          if (filterCl !== "all" && r.cl !== filterCl) return false;
+          if (filterPref !== "all" && r.pref !== filterPref) return false;
+          if (search) {
+            const q = search.toLowerCase();
+            return r.name.toLowerCase().includes(q) || r.hr.toLowerCase().includes(q) || r.team.toLowerCase().includes(q);
+          }
+          return true;
+        });
+      }, [filterTeam, filterCl, filterPref, search]);
+
+      const teamStats = useMemo(() => {
+        const s = {};
+        ALL.filter(r=>r.team).forEach(r => {
+          if (!s[r.team]) s[r.team] = { team:r.team, total:0, clear:0, partial:0, unclear:0 };
+          s[r.team].total++;
+          s[r.team][r.cl]++;
+        });
+        return Object.values(s).sort((a,b) => b.total - a.total);
+      }, []);
+
+      const tabs = [
+        { id:"responses", label:"📋 الردود الكاملة" },
+        { id:"overview",  label:"📊 ملخص الإجابات" },
+        { id:"teams",     label:"👥 تحليل التيمات" },
+      ];
+
+      const selStyle = (active) => ({
+        padding:"11px 18px", fontSize:"13px", cursor:"pointer",
+        background:"transparent", border:"none",
+        borderBottom:`2px solid ${active ? T.accent : "transparent"}`,
+        color: active ? T.text : T.dim,
+        fontWeight: active ? "600" : "400",
+        transition:"all 0.15s",
+      });
+
+      const cardS = { background:T.card, border:`1px solid ${T.border}`, borderRadius:"12px", padding:"16px 18px" };
+
+      return (
+        <div style={{ minHeight:"100vh", background:T.bg, color:T.text, fontFamily:"system-ui,-apple-system,sans-serif", fontSize:"13px" }}>
+
+          <div style={{ background:T.surface, borderBottom:`1px solid ${T.border}`, padding:"16px 28px", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+            <div>
+              <div style={{ fontSize:"17px", fontWeight:"700" }}>Feedback Survey — نتائج الاستبيان</div>
+              <div style={{ fontSize:"11px", color:T.dim, marginTop:"3px" }}>شرح الأيفنتات الأربعة (Duels) · 2–5 سبتمبر 2026</div>
+            </div>
+            <div style={{ display:"flex", gap:"8px" }}>
+              <div style={{ background:"rgba(34,197,94,0.1)", border:"1px solid rgba(34,197,94,0.25)", borderRadius:"100px", padding:"4px 14px", fontSize:"12px", color:"#22c55e", fontWeight:"600" }}>80 استجابة</div>
+              <div style={{ background:"rgba(59,130,246,0.1)", border:"1px solid rgba(59,130,246,0.25)", borderRadius:"100px", padding:"4px 14px", fontSize:"12px", color:"#3b82f6" }}>82.5% واضح جداً</div>
+            </div>
+          </div>
+
+          <div style={{ background:T.surface, borderBottom:`1px solid ${T.border}`, padding:"0 28px", display:"flex", gap:"2px" }}>
+            {tabs.map(t => <button key={t.id} onClick={()=>setTab(t.id)} style={selStyle(tab===t.id)}>{t.label}</button>)}
+          </div>
+
+          <div style={{ padding:"20px 28px" }}>
+
+            {tab === "responses" && (
+              <div style={{ display:"flex", flexDirection:"column", gap:"14px" }}>
+                <div style={{ ...cardS, display:"flex", gap:"12px", flexWrap:"wrap", alignItems:"center" }}>
+                  <div style={{ display:"flex", alignItems:"center", gap:"8px" }}>
+                    <span style={{ color:T.dim, fontSize:"12px" }}>بحث:</span>
+                    <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="اسم أو كود..."
+                      style={{ background:T.bg, border:`1px solid ${T.border}`, borderRadius:"6px", padding:"5px 10px", color:T.text, fontSize:"12px", width:"150px" }} />
+                  </div>
+                  <div style={{ display:"flex", alignItems:"center", gap:"8px" }}>
+                    <span style={{ color:T.dim, fontSize:"12px" }}>Team:</span>
+                    <select value={filterTeam} onChange={e=>setFilterTeam(e.target.value)}
+                      style={{ background:T.bg, border:`1px solid ${T.border}`, borderRadius:"6px", padding:"5px 8px", color:T.text, fontSize:"12px" }}>
+                      <option value="all">كل التيمات</option>
+                      {ALL_TEAMS.map(t => <option key={t} value={t}>Team {t}</option>)}
+                    </select>
+                  </div>
+                  <div style={{ display:"flex", alignItems:"center", gap:"8px" }}>
+                    <span style={{ color:T.dim, fontSize:"12px" }}>الوضوح:</span>
+                    <select value={filterCl} onChange={e=>setFilterCl(e.target.value)}
+                      style={{ background:T.bg, border:`1px solid ${T.border}`, borderRadius:"6px", padding:"5px 8px", color:T.text, fontSize:"12px" }}>
+                      <option value="all">الكل</option>
+                      <option value="clear">واضح جداً</option>
+                      <option value="partial">واضح إلى حد ما</option>
+                      <option value="unclear">غير واضح</option>
+                    </select>
+                  </div>
+                  <div style={{ display:"flex", alignItems:"center", gap:"8px" }}>
+                    <span style={{ color:T.dim, fontSize:"12px" }}>الفيدباك:</span>
+                    <select value={filterPref} onChange={e=>setFilterPref(e.target.value)}
+                      style={{ background:T.bg, border:`1px solid ${T.border}`, borderRadius:"6px", padding:"5px 8px", color:T.text, fontSize:"12px" }}>
+                      <option value="all">الكل</option>
+                      <option value="online">Session online</option>
+                      <option value="1:1">Feedback 1:1</option>
+                      <option value="site">Session on site</option>
+                    </select>
+                  </div>
+                  <span style={{ color:T.muted, fontSize:"11px", marginRight:"auto" }}>عرض {filtered.length} من {ALL.length}</span>
+                </div>
+
+                <div style={{ ...cardS, padding:"0", overflow:"hidden" }}>
+                  <div style={{ overflowX:"auto", overflowY:"auto", maxHeight:"calc(100vh - 280px)" }}>
+                    <table style={{ width:"100%", borderCollapse:"collapse", fontSize:"12px" }}>
+                      <thead>
+                        <tr style={{ background:T.bg, borderBottom:`1px solid ${T.border}`, position:"sticky", top:0 }}>
+                          {["#","الاسم","HR-Code","Team","الوضوح","صُحح له","يحتاج أمثلة","الفيدباك","💬"].map(h => (
+                            <th key={h} style={{ padding:"10px 14px", textAlign:"right", color:T.dim, fontWeight:"500", whiteSpace:"nowrap" }}>{h}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filtered.map((r, i) => (
+                          <tr key={r.id} style={{ borderBottom:`1px solid ${T.border}`, background: i%2===0 ? "transparent" : "rgba(255,255,255,0.015)" }}>
+                            <td style={{ padding:"9px 14px", color:T.dim }}>{r.id}</td>
+                            <td style={{ padding:"9px 14px", color:T.text, whiteSpace:"nowrap" }}>{r.name || <span style={{ color:T.dim }}>—</span>}</td>
+                            <td style={{ padding:"9px 14px", color:T.muted, fontFamily:"monospace", fontSize:"11px" }}>{r.hr || "—"}</td>
+                            <td style={{ padding:"9px 14px" }}>
+                              {r.team ? <span style={{ background:`${T.accent}20`, color:T.accent, padding:"2px 7px", borderRadius:"4px", fontSize:"11px" }}>{r.team}</span> : <span style={{ color:T.dim }}>—</span>}
+                            </td>
+                            <td style={{ padding:"9px 14px" }}><Badge label={CL_LABEL[r.cl]} color={CL_COLOR[r.cl]} /></td>
+                            <td style={{ padding:"9px 14px", color:T.muted, maxWidth:"160px", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{r.corrected}</td>
+                            <td style={{ padding:"9px 14px" }}>
+                              {r.needs !== "none" ? <span style={{ color:"#f59e0b", fontSize:"11px" }}>{r.needs}</span> : <span style={{ color:T.dim }}>مفيش</span>}
+                            </td>
+                            <td style={{ padding:"9px 14px" }}>
+                              <span style={{ color: PREF_COLOR[r.pref] || T.muted, fontSize:"11px" }}>
+                                {r.pref === "1:1" ? "1:1" : r.pref === "online" ? "Online" : r.pref === "site" ? "On site" : "—"}
+                              </span>
+                            </td>
+                            <td style={{ padding:"9px 14px", textAlign:"center" }}>{r.note && "💬"}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {tab === "overview" && (
+              <div style={{ display:"flex", flexDirection:"column", gap:"16px" }}>
+                <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:"12px" }}>
+                  {[
+                    { v:"82.5%", l:"واضح جداً", s:"66 من 80", c:"#22c55e" },
+                    { v:"71%",   l:"سرعة اللقطة", s:"السبب الأول للصعوبة", c:"#ef4444" },
+                    { v:"17",   l:"Positioning Duel", s:"الأكثر محتاجين تصحيح", c:"#f59e0b" },
+                    { v:"50%",  l:"Session online", s:"الفيدباك المفضل", c:"#3b82f6" },
+                  ].map((k,i) => (
+                    <div key={i} style={cardS}>
+                      <div style={{ fontSize:"28px", fontWeight:"700", color:k.c }}>{k.v}</div>
+                      <div style={{ fontSize:"12px", fontWeight:"600", color:T.text, marginTop:"5px" }}>{k.l}</div>
+                      <div style={{ fontSize:"11px", color:T.dim, marginTop:"2px" }}>{k.s}</div>
+                    </div>
+                  ))}
+                </div>
+
+                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"16px" }}>
+                  {[
+                    { title:"وضوح شرح الأيفنتات", data:[{label:"واضح جداً",n:66,color:"#22c55e"},{label:"واضح إلى حد ما",n:12,color:"#f59e0b"},{label:"غير واضح",n:2,color:"#ef4444"}], max:80 },
+                    { title:"طريقة الفيدباك المفضلة", data:[{label:"Session online",n:40,color:"#3b82f6"},{label:"Feedback one to one",n:31,color:"#8b5cf6"},{label:"Session on site",n:8,color:"#22c55e"}], max:80 },
+                    { title:"الأيفنتات اللي الفيديو صحح فهمها", data:[{label:"لا — فاهمهم صح",n:55,color:"#22c55e"},{label:"Positioning Duel",n:17,color:"#f59e0b"},{label:"Separation Duel",n:11,color:"#f97316"},{label:"Hold up",n:8,color:"#8b5cf6"},{label:"Leg Stretch",n:4,color:"#06b6d4"}], max:60 },
+                    { title:"الأيفنت اللي لسه محتاج أمثلة", data:[{label:"مفيش — كل الأيفنتات واضحة",n:64,color:"#22c55e"},{label:"Positioning Duel",n:9,color:"#f59e0b"},{label:"Separation Duel",n:4,color:"#f97316"},{label:"Hold up",n:2,color:"#8b5cf6"},{label:"Leg Stretch",n:2,color:"#06b6d4"}], max:80 },
+                  ].map((sec, si) => (
+                    <div key={si} style={cardS}>
+                      <div style={{ fontWeight:"600", marginBottom:"14px" }}>{sec.title}</div>
+                      {sec.data.map((d,i) => (
+                        <div key={i} style={{ marginBottom:"9px" }}>
+                          <div style={{ display:"flex", justifyContent:"space-between", fontSize:"12px", marginBottom:"4px" }}>
+                            <span style={{ color:d.color, fontWeight:"500" }}>{d.n} ({Math.round(d.n/80*100)}%)</span>
+                            <span style={{ color:T.muted }}>{d.label}</span>
+                          </div>
+                          <div style={{ height:"5px", borderRadius:"3px", background:T.border }}>
+                            <div style={{ height:"5px", borderRadius:"3px", width:`${d.n/sec.max*100}%`, background:d.color }} />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+
+                <div style={{ background:"rgba(239,68,68,0.07)", border:"1px solid rgba(239,68,68,0.25)", borderRadius:"12px", padding:"16px 20px" }}>
+                  <div style={{ fontWeight:"700", color:"#ef4444", marginBottom:"6px" }}>🚨 Signal بارز في التعليقات المفتوحة (15+ شخص)</div>
+                  <div style={{ fontSize:"12px", color:T.muted, lineHeight:"1.7" }}>
+                    السبب الحقيقي لانخفاض الكواليتي حسب الكوليكتورز ليس عدم فهم الأيفنتات، بل <strong style={{ color:"#f87171" }}>زيادة التاسك من 7.5 إلى 1 Wan مع ضغط الـ SLA</strong>. يتكرر في أكثر من 15 تعليق مكتوب ويحتاج رفعه للإدارة.
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {tab === "teams" && (
+              <div style={{ display:"flex", flexDirection:"column", gap:"14px" }}>
+                <div style={{ ...cardS, padding:"0", overflow:"hidden" }}>
+                  <table style={{ width:"100%", borderCollapse:"collapse", fontSize:"12px" }}>
+                    <thead>
+                      <tr style={{ background:T.bg, borderBottom:`1px solid ${T.border}` }}>
+                        {["Team","إجمالي","واضح جداً","إلى حد ما","غير واضح","% وضوح"].map(h => (
+                          <th key={h} style={{ padding:"10px 16px", textAlign:"right", color:T.dim, fontWeight:"500" }}>{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {teamStats.map((t, i) => {
+                        const p = Math.round(t.clear / t.total * 100);
+                        const barColor = p >= 90 ? "#22c55e" : p >= 70 ? "#f59e0b" : "#ef4444";
+                        return (
+                          <tr key={t.team} style={{ borderBottom:`1px solid ${T.border}`, background: i%2===0 ? "transparent" : "rgba(255,255,255,0.015)" }}>
+                            <td style={{ padding:"10px 16px" }}><span style={{ background:`${T.accent}20`, color:T.accent, padding:"3px 10px", borderRadius:"6px", fontWeight:"600" }}>Team {t.team}</span></td>
+                            <td style={{ padding:"10px 16px", color:T.text, fontWeight:"600" }}>{t.total}</td>
+                            <td style={{ padding:"10px 16px", color:"#22c55e" }}>{t.clear}</td>
+                            <td style={{ padding:"10px 16px", color:"#f59e0b" }}>{t.partial || "—"}</td>
+                            <td style={{ padding:"10px 16px", color:"#ef4444" }}>{t.unclear || "—"}</td>
+                            <td style={{ padding:"10px 16px" }}>
+                              <div style={{ display:"flex", alignItems:"center", gap:"8px" }}>
+                                <div style={{ height:"6px", width:"80px", borderRadius:"3px", background:T.border }}>
+                                  <div style={{ height:"6px", borderRadius:"3px", width:`${p}%`, background:barColor }} />
+                                </div>
+                                <span style={{ color:barColor, fontWeight:"600" }}>{p}%</span>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
+  </script>
+</body>
+</html>
